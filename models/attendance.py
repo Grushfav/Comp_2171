@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from typing import Optional
 
 class Attendance:
@@ -13,12 +13,15 @@ class Attendance:
         self._is_late = False
         self._status = "absent"  # absent, present, late
 
-    def sign_in(self, time: datetime, late_threshold_minutes: int = 15) -> None:
-        self._sign_in_time = time
+    def sign_in(self, current_time: datetime, expected_time: time) -> None:
+        self._sign_in_time = current_time
         self._status = "present"
         
-        # Check if late (more than threshold minutes after class start time)
-        if (time - self._attendance_date) > timedelta(minutes=late_threshold_minutes):
+        # Convert current_time to time object for comparison
+        current_time_only = current_time.time()
+        
+        # Check if late
+        if current_time_only > expected_time:
             self._is_late = True
             self._status = "late"
 

@@ -48,8 +48,12 @@ class AuthController:
         try:
             with self._db_manager.get_connection() as conn:
                 cursor = conn.cursor()
+                # Modified query to properly join and get student data
                 cursor.execute('''
-                    SELECT * FROM users WHERE username = ? AND password = ?
+                    SELECT u.*, s.student_id, s.contact_number, s.emergency_contact
+                    FROM users u 
+                    LEFT JOIN students s ON u.user_id = s.user_id 
+                    WHERE u.username = ? AND u.password = ?
                 ''', (username, password))
                 
                 user = cursor.fetchone()
@@ -57,7 +61,6 @@ class AuthController:
                     self._current_user = dict(user)
                     return self._current_user
                 return None
-
         except Exception as e:
             print(f"Error during login: {e}")
             return None

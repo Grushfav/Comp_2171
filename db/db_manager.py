@@ -52,7 +52,8 @@ class DBManager:
                     start_date TEXT NOT NULL,
                     end_date TEXT NOT NULL,
                     location TEXT,
-                    max_capacity INTEGER
+                    max_capacity INTEGER,
+                    expected_attendance_time TEXT
                 )
             ''')
 
@@ -61,15 +62,27 @@ class DBManager:
                 CREATE TABLE IF NOT EXISTS attendance (
                     attendance_id INTEGER PRIMARY KEY,
                     student_id INTEGER,
-                    course_id INTEGER,
                     attendance_date TEXT NOT NULL,
                     sign_in_time TEXT,
                     sign_out_time TEXT,
                     status TEXT,
-                    is_late BOOLEAN,
+                    is_late BOOLEAN DEFAULT 0,
+                    FOREIGN KEY (student_id) REFERENCES students (student_id)
+                )
+            ''')
+
+            # Create student_courses table for enrollment
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS student_courses (
+                    student_id INTEGER,
+                    course_id INTEGER,
+                    enrollment_date TEXT DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (student_id, course_id),
                     FOREIGN KEY (student_id) REFERENCES students (student_id),
                     FOREIGN KEY (course_id) REFERENCES courses (course_id)
                 )
             ''')
+
+            
 
             conn.commit() 
